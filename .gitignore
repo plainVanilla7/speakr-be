@@ -1,0 +1,71 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Logs
+logs/
+*.log
+*.log.*
+logs/*.log
+logs/*.log.*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+*.seed.lock
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Directory for environment-specific configurations
+config/
+
+# Dependencies
+/node_modules
+/bower_components
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Coverage directory used by testing tools
+coverage/
+.nyc_output/
+
+# IDE and Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# PM2 specific files (for Node.js process management)
+.pids
+pm2.log
+pm2.pid
+
+# Miscellaneous
+*.bak
+*.tmp
+
+# Build files
+dist/
+build/
