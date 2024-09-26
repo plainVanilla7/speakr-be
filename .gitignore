@@ -69,3 +69,4 @@ pm2.pid
 # Build files
 dist/
 build/
+/node_modules/
