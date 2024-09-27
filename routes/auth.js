@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator'); // Importing necessary functions
 
 // User Model
 const User = require('../models/User');
@@ -11,16 +12,11 @@ const User = require('../models/User');
 // @route   POST /api/auth/register
 // @desc    Register a new user
 // @access  Public
-
-// @route   POST /api/auth/register
-// @desc    Register new user
-// @access  Public
 router.post(
     '/register',
     [
         body('username', 'Username is required').not().isEmpty(),
         body('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
-        body('email', 'Invalid email').optional().isEmail(),
     ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -28,7 +24,7 @@ router.post(
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { username, email, password } = req.body;
+        const { username,  password } = req.body;
 
         try {
             // Check if username already exists
@@ -37,18 +33,10 @@ router.post(
                 return res.status(400).json({ message: 'Username already exists' });
             }
 
-            // If email is provided, check if it's already in use
-            if (email) {
-                let emailUser = await User.findOne({ email });
-                if (emailUser) {
-                    return res.status(400).json({ message: 'Email already in use' });
-                }
-            }
 
             // Create a new user
             user = new User({
                 username,
-                email, // This can be undefined if not provided
                 password,
             });
 
@@ -82,8 +70,6 @@ router.post(
         }
     }
 );
-
-module.exports = router;
 
 // @route   POST /api/auth/login
 // @desc    Authenticate user and get token

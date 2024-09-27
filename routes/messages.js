@@ -11,6 +11,7 @@ const Conversation = require('../models/Conversation');
 // @route   POST /api/messages
 // @desc    Send a message
 // @access  Private
+
 router.post('/', authMiddleware, async (req, res) => {
     const { conversationId, text } = req.body;
 
@@ -26,12 +27,21 @@ router.post('/', authMiddleware, async (req, res) => {
         // Update the conversation's updatedAt field
         await Conversation.findByIdAndUpdate(conversationId, { updatedAt: Date.now() });
 
-        // Emit the message to the conversation room
         const io = req.app.get('io');
-        io.to(conversationId).emit('newMessage', message);
-        console.log(`Message sent in conversation ${conversationId}:`, message);
+        io.to(conversationId).emit('newMessage', {
+            id: message._id,  // Ensure id is sent to the client
+            text: message.text,
+            sender: message.sender,
+            createdAt: message.createdAt
+        });
 
-        res.status(201).json(message);
+        res.status(201).json({
+            id: message._id,  // Send id in the response
+            conversationId: message.conversationId,
+            sender: message.sender,
+            text: message.text,
+            createdAt: message.createdAt,
+        });
     } catch (err) {
         console.error('Error sending message:', err);
         res.status(500).send('Server error');
@@ -41,13 +51,23 @@ router.post('/', authMiddleware, async (req, res) => {
 // @route   GET /api/messages/:conversationId
 // @desc    Get messages in a conversation
 // @access  Private
+
 router.get('/:conversationId', authMiddleware, async (req, res) => {
+    const { conversationId } = req.params;
+
+    // Validate that conversationId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(conversationId)) {
+        return res.status(400).json({ message: 'Invalid conversation ID' });
+    }
+
     try {
-        const messages = await Message.find({
-            conversationId: req.params.conversationId,
-        })
+        const messages = await Message.find({ conversationId })
             .populate('sender', 'username')
             .sort({ createdAt: 1 });
+
+        if (!messages.length) {
+            return res.status(404).json({ message: 'No messages found for this conversation' });
+        }
 
         res.json(messages);
     } catch (err) {

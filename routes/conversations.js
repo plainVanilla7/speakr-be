@@ -8,6 +8,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
 
+
 // @route   POST /api/conversations
 // @desc    Create a new conversation
 // @access  Private
@@ -20,7 +21,14 @@ router.post('/', authMiddleware, async (req, res) => {
             participants: { $all: [req.user.id, recipientId] },
         });
 
-        if (conversation) return res.status(200).json(conversation);
+        if (conversation) {
+            return res.status(200).json({
+                id: conversation._id,
+                participants: conversation.participants,
+                createdAt: conversation.createdAt,
+                updatedAt: conversation.updatedAt
+            });
+        }
 
         // Create new conversation
         conversation = new Conversation({
@@ -28,14 +36,21 @@ router.post('/', authMiddleware, async (req, res) => {
         });
 
         await conversation.save();
-        console.log(`New conversation created:`, conversation);
 
-        res.status(201).json(conversation);
+        res.status(201).json({
+            id: conversation._id,  // Map _id to id
+            participants: conversation.participants,
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt
+        });
     } catch (err) {
         console.error('Error creating conversation:', err);
         res.status(500).send('Server error');
     }
 });
+
+
+
 
 // @route   GET /api/conversations
 // @desc    Get user's conversations
@@ -48,7 +63,14 @@ router.get('/', authMiddleware, async (req, res) => {
             .populate('participants', 'username')
             .sort({ updatedAt: -1 });
 
-        res.json(conversations);
+        const formattedConversations = conversations.map(conversation => ({
+            id: conversation._id,  // Map _id to id
+            participants: conversation.participants,
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt,
+        }));
+
+        res.json(formattedConversations);
     } catch (err) {
         console.error('Error fetching conversations:', err);
         res.status(500).send('Server error');
