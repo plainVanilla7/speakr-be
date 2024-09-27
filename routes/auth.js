@@ -53,15 +53,13 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        // Check for user
         const user = await User.findOne({ username });
         if (!user)
-            return res.status(400).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Invalid credentials' });
 
-        // Verify password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch)
-            return res.status(400).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Invalid credentials' });
 
         // Create and return JWT
         const payload = { user: { id: user.id } };
