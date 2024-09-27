@@ -21,7 +21,6 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json()); // Parses incoming JSON requests and puts the parsed data in req.body
 
-// Logging middleware to log each incoming request
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url} - Body:`, req.body);
     next();
@@ -72,7 +71,7 @@ io.on('connection', (socket) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/conversations', require('./routes/conversations'));
 app.use('/api/messages', require('./routes/messages'));
-app.use('/api/users', require('./routes/users')); // Added this line
+app.use('/api/users', require('./routes/users'));
 
 // Database Connection
 mongoose

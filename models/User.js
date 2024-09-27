@@ -10,6 +10,12 @@ const UserSchema = new mongoose.Schema(
             unique: true,
             trim: true,
         },
+        email: {
+            type: String,
+            required: false,
+            lowercase: true,
+            trim: true,
+        },
         password: {
             type: String,
             required: true,
@@ -20,6 +26,10 @@ const UserSchema = new mongoose.Schema(
                 ref: 'User',
             },
         ],
+        avatar: {
+            type: String,
+            default: '',
+        },
     },
     { timestamps: true }
 );
